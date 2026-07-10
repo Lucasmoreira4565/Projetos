@@ -1,0 +1,141 @@
+interface TimeSlotsProps {
+  dataSelecionada: Date;
+  horarioSelecionado: string | null;
+  setHorarioSelecionado: (hora: string | null) => void;
+  nome: string;
+  setNome: (nome: string) => void;
+  telefone: string;
+  setTelefone: (tel: string) => void;
+  email: string;
+  setEmail: (email: string) => void;
+  isModalAberto: boolean;
+  setIsModalAberto: (aberto: boolean) => void;
+}
+
+export default function TimeSlots({
+  dataSelecionada,
+  horarioSelecionado,
+  setHorarioSelecionado,
+  nome,
+  setNome,
+  telefone,
+  setTelefone,
+  email,
+  setEmail,
+  isModalAberto,
+  setIsModalAberto,
+}: TimeSlotsProps) {
+  const horariosDisponiveis = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
+
+  const ano = dataSelecionada.getFullYear();
+  const mes = String(dataSelecionada.getMonth() + 1).padStart(2, "0");
+  const dia = String(dataSelecionada.getDate()).padStart(2, "0");
+  const dataFormatada = `${ano}-${mes}-${dia}`;
+
+  const agendamentosExistentes = [
+    { data: "2026-07-06", hora: "09:00" },
+    { data: "2026-07-06", hora: "14:00" },
+    { data: "2026-07-07", hora: "10:00" },
+  ];
+
+  return (
+    <div className="w-full max-w-sm mt-6 bg-[#121212] border border-zinc-800 rounded-2xl p-6 shadow-2xl text-left block">
+      <h3 className="text-lg font-semibold text-zinc-200 mb-4">Horários disponíveis:</h3>
+      
+      <div className="grid grid-cols-4 gap-3 mb-6">
+        {horariosDisponiveis.map((hora) => {
+          const estaSelecionado = hora === horarioSelecionado;
+          const horarioOcupado = agendamentosExistentes.some(
+            (agenda) => agenda.data === dataFormatada && agenda.hora === hora
+          );
+
+          if (horarioOcupado) return null;
+
+          return (
+            <button
+              key={hora}
+              type="button"
+              onClick={() => setHorarioSelecionado(hora)}
+              className={`p-3 border rounded-xl text-center font-medium transition cursor-pointer text-sm block w-full ${
+                estaSelecionado
+                  ? "bg-zinc-100 border-white text-black font-bold"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              }`}
+            >
+              {hora}
+            </button>
+          );
+        })}
+      </div>
+
+      {horarioSelecionado && (
+        <button
+          onClick={() => setIsModalAberto(true)}
+          className="w-full p-4 bg-green-800 hover:bg-zinc-200 text-white font-bold rounded-xl transition cursor-pointer text-center block mb-2"
+        >
+          Agendar Horário!
+        </button>
+      )}
+
+      {isModalAberto && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm z-50">
+          <div className="w-full max-w-md bg-[#161616] border border-zinc-800 rounded-2xl p-6 shadow-2xl text-left relative">
+            <h3 className="text-xl font-bold text-zinc-100 mb-6">Finalizar Agendamento</h3>
+
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-zinc-400 mb-2">Nome Completo</label>
+              <input
+                type="text"
+                placeholder="Ex: João Silva"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-zinc-400 mb-2">Telefone / WhatsApp</label>
+              <input
+                type="tel"
+                placeholder="(11) 99999-9999"
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-xs font-medium text-zinc-400 mb-2">E-mail</label>
+              <input
+                type="email"
+                placeholder="joao@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsModalAberto(false)}
+                className="flex-1 p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 font-medium rounded-xl transition cursor-pointer text-center text-sm"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={() => {
+                  alert(`Seu corte está para as ${horarioSelecionado}, ${nome ? nome.trim().split(" ")[0] : ""}. Até breve!`);
+                  setIsModalAberto(false);
+                }}
+                className="flex-1 p-3 bg-zinc-100 hover:bg-zinc-200 text-black font-bold rounded-xl transition cursor-pointer"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

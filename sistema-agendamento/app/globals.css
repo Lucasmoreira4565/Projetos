@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f4f5;
+  --foreground: #09090b;
+
+  /* Força as variáveis nativas de cor do DayPicker em todo o site */
+  --rdp-accent-color: #f4f4f5 !important;      /* Fundo do dia selecionado (zinc-100) */
+  --rdp-accent-text-color: #09090b !important; /* Texto do dia selecionado (zinc-950) */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Garante que o FullCalendar não herde fundo preto */
+.fc {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ========================================================
+   FORÇAR CORES DO CONFIGURADOR DO CALENDÁRIO (ZINC)
+   ======================================================== */
+
+/* Força os botões, setas e textos nativos a ignorarem o azul */
+.rdp-root,
+.rdp-chevron,
+.rdp-today,
+.rdp-root button {
+  color: #a1a1aa !important; /* Muda setas e o dia de hoje para cinza (zinc-400) */
+}
+
+/* Altera a cor dos botões ao passar o mouse */
+.rdp-root button:hover {
+  color: #f4f4f5 !important; /* Destaque em zinc-100 */
+}
+
+/* Garante que as células selecionadas apliquearm os estilos corretamente no v9 */
+.rdp-day_selected, 
+.rdp-day_selected:hover {
+  background-color: #f4f4f5 !important; /* Fundo zinc-100 */
+  color: #09090b !important;            /* Texto zinc-950 */
+}
