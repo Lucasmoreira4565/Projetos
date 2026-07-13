@@ -50,12 +50,14 @@ export default function TimeSlots({
       <div className="grid grid-cols-4 gap-3 mb-6">
         {horariosDisponiveis.map((hora) => {
           const estaSelecionado = hora === horarioSelecionado;
-          const horarioOcupado = agendamentos.some(
-            (agenda: any) => agenda.data === dataFormatada && agenda.hora === hora
-          );
+          const horarioOcupado = agendamentos.some((agenda: any) => {
+            const apenasDataDoBanco = agenda.data.split(" ")[0] || agenda.data.substring(0, 10);
+            const mesmaHora = agenda.data.includes(hora);
+            return apenasDataDoBanco === dataFormatada && mesmaHora;
+            });
 
-          if (horarioOcupado) return null;
-
+            if (horarioOcupado) return null;
+            
           return (
             <button
               key={hora}

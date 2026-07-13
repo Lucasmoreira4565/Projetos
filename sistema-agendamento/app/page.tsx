@@ -2,7 +2,6 @@
 
 import { useState,useEffect } from "react";
 import { createClient } from "@/supabase/lib/supabase/client";
-import "react-day-picker/dist/style.css";
 import BannerHeader from "@/components/bannerheader";
 import Calendar from "@/components/calendar";
 import TimeSlots from "@/components/timeslots";
@@ -18,7 +17,7 @@ export default function Home() {
   const [agendamentos, setAgendamentos] = useState<any[]>([]);
   const supabase = createClient();
   
-useEffect(() => {
+ useEffect(() => {
   async function buscarAgendamentos() {
     const supabase = createClient();
     const { data } = await supabase.from("agendamento").select(); // <-- Nome exato da sua tabela
@@ -27,7 +26,7 @@ useEffect(() => {
     }
   }
   buscarAgendamentos();
-}, []);
+ }, []);
 
 async function criarNovoAgendamento() {
   // 1. Combinando a data do calendário com a string do horário escolhido
