@@ -10,6 +10,14 @@ interface TimeSlotsProps {
   setEmail: (email: string) => void;
   isModalAberto: boolean;
   setIsModalAberto: (aberto: boolean) => void;
+  agendamentos: {
+    id: number;
+    Nome_completo: string| null;
+    Email: string| null;
+    Telefone: number| null;
+    data: string;
+  }[];
+  criarNovoAgendamento: () => Promise<void>;
 }
 
 export default function TimeSlots({
@@ -24,6 +32,8 @@ export default function TimeSlots({
   setEmail,
   isModalAberto,
   setIsModalAberto,
+  agendamentos,
+  criarNovoAgendamento,
 }: TimeSlotsProps) {
   const horariosDisponiveis = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
 
@@ -32,12 +42,7 @@ export default function TimeSlots({
   const dia = String(dataSelecionada.getDate()).padStart(2, "0");
   const dataFormatada = `${ano}-${mes}-${dia}`;
 
-  const agendamentosExistentes = [
-    { data: "2026-07-06", hora: "09:00" },
-    { data: "2026-07-06", hora: "14:00" },
-    { data: "2026-07-07", hora: "10:00" },
-  ];
-
+ 
   return (
     <div className="w-full max-w-sm mt-6 bg-[#121212] border border-zinc-800 rounded-2xl p-6 shadow-2xl text-left block">
       <h3 className="text-lg font-semibold text-zinc-200 mb-4">Horários disponíveis:</h3>
@@ -45,8 +50,8 @@ export default function TimeSlots({
       <div className="grid grid-cols-4 gap-3 mb-6">
         {horariosDisponiveis.map((hora) => {
           const estaSelecionado = hora === horarioSelecionado;
-          const horarioOcupado = agendamentosExistentes.some(
-            (agenda) => agenda.data === dataFormatada && agenda.hora === hora
+          const horarioOcupado = agendamentos.some(
+            (agenda: any) => agenda.data === dataFormatada && agenda.hora === hora
           );
 
           if (horarioOcupado) return null;
@@ -124,12 +129,9 @@ export default function TimeSlots({
               </button>
 
               <button
-                onClick={() => {
-                  alert(`Seu corte está para as ${horarioSelecionado}, ${nome ? nome.trim().split(" ")[0] : ""}. Até breve!`);
-                  setIsModalAberto(false);
-                }}
-                className="flex-1 p-3 bg-zinc-100 hover:bg-zinc-200 text-black font-bold rounded-xl transition cursor-pointer"
-              >
+                onClick={criarNovoAgendamento} // <-- AGORA ELE CHAMA A FUNÇÃO QUE SALVA NO SUPABASE
+                className="flex-1 p-3 bg-zinc-100 hover:bg-zinc-200 text-black font-bold rounded-xl transition cursor-pointer text-sm"
+                  >
                 Confirmar
               </button>
             </div>

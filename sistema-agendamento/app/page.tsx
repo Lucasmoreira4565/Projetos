@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import { createClient } from "@/supabase/lib/supabase/client";
 import "react-day-picker/dist/style.css";
-
 import BannerHeader from "@/components/bannerheader";
 import Calendar from "@/components/calendar";
 import TimeSlots from "@/components/timeslots";
@@ -15,6 +15,53 @@ export default function Home() {
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
   const [isModalAberto, setIsModalAberto] = useState(false);
+  const [agendamentos, setAgendamentos] = useState<any[]>([]);
+  const supabase = createClient();
+  
+useEffect(() => {
+  async function buscarAgendamentos() {
+    const supabase = createClient();
+    const { data } = await supabase.from("agendamento").select(); // <-- Nome exato da sua tabela
+    if (data) {
+      setAgendamentos(data);
+    }
+  }
+  buscarAgendamentos();
+}, []);
+
+async function criarNovoAgendamento() {
+  // 1. Combinando a data do calendário com a string do horário escolhido
+  const ano = dataSelecionada?.getFullYear();
+  const mes = String(dataSelecionada ? dataSelecionada.getMonth() + 1 : "").padStart(2, "0");
+  const dia = String(dataSelecionada?.getDate()).padStart(2, "0");
+  
+  // Exemplo de resultado: "2026-07-13 14:00:00"
+  const dataStringFormatada = `${ano}-${mes}-${dia} ${horarioSelecionado}:00`;
+
+  // 2. Disparando o INSERT para a tabela do Supabase
+  const { error } = await supabase
+    .from("agendamento")
+    .insert([
+      {
+        nome_completo: nome, // Nome da coluna que ajustamos no banco
+        email: email,
+        telefone: Number(telefone), // Forçando o texto do input a virar número para o banco aceitar
+        data: dataStringFormatada,
+      },
+    ]);
+
+  if (error) {
+    console.error("Erro ao salvar agendamento:", error.message);
+    alert("Falha ao salvar agendamento no banco!");
+  } else {
+    alert("Agendamento realizado com sucesso!");
+    setIsModalAberto(false); // Fecha o modal após o sucesso
+    
+    // Atualiza a lista na tela chamando a busca novamente
+    const { data } = await supabase.from("agendamento").select();
+    if (data) setAgendamentos(data);
+  }
+}
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#000000] text-[#ededed] p-8">
@@ -45,6 +92,8 @@ export default function Home() {
                 setEmail={setEmail}
                 isModalAberto={isModalAberto}
                 setIsModalAberto={setIsModalAberto}
+                agendamentos={agendamentos}
+                criarNovoAgendamento={criarNovoAgendamento}
               />
             )}
           </div>
