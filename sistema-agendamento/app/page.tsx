@@ -20,7 +20,7 @@ export default function Home() {
  useEffect(() => {
   async function buscarAgendamentos() {
     const supabase = createClient();
-    const { data } = await supabase.from("agendamento").select(); // <-- Nome exato da sua tabela
+    const { data } = await supabase.from("agendamento").select();
     if (data) {
       setAgendamentos(data);
     }
@@ -29,23 +29,18 @@ export default function Home() {
  }, []);
 
 async function criarNovoAgendamento() {
-  // 1. Combinando a data do calendário com a string do horário escolhido
+  
   const ano = dataSelecionada?.getFullYear();
   const mes = String(dataSelecionada ? dataSelecionada.getMonth() + 1 : "").padStart(2, "0");
   const dia = String(dataSelecionada?.getDate()).padStart(2, "0");
-  
-  // Exemplo de resultado: "2026-07-13 14:00:00"
   const dataStringFormatada = `${ano}-${mes}-${dia} ${horarioSelecionado}:00`;
-
-  // 2. Disparando o INSERT para a tabela do Supabase
   const { error } = await supabase
     .from("agendamento")
     .insert([
       {
-        nome_completo: nome, // Nome da coluna que ajustamos no banco
+        nome_completo: nome, 
         email: email,
-        telefone: Number(telefone), // Forçando o texto do input a virar número para o banco aceitar
-        data: dataStringFormatada,
+        telefone: Number(telefone), 
       },
     ]);
 
@@ -54,9 +49,9 @@ async function criarNovoAgendamento() {
     alert("Falha ao salvar agendamento no banco!");
   } else {
     alert("Agendamento realizado com sucesso!");
-    setIsModalAberto(false); // Fecha o modal após o sucesso
+    setIsModalAberto(false); 
     
-    // Atualiza a lista na tela chamando a busca novamente
+    
     const { data } = await supabase.from("agendamento").select();
     if (data) setAgendamentos(data);
   }
