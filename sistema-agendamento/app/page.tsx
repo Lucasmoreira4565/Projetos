@@ -26,7 +26,7 @@ export default function Home() {
     }
   }
   buscarAgendamentos();
- }, []);
+ },[]);
 
 async function criarNovoAgendamento() {
   
@@ -34,13 +34,14 @@ async function criarNovoAgendamento() {
   const mes = String(dataSelecionada ? dataSelecionada.getMonth() + 1 : "").padStart(2, "0");
   const dia = String(dataSelecionada?.getDate()).padStart(2, "0");
   const dataStringFormatada = `${ano}-${mes}-${dia} ${horarioSelecionado}:00`;
-  const { error } = await supabase
-    .from("agendamento")
-    .insert([
+  const { error } = await supabase.
+  from("agendamento")
+  .insert([
       {
         nome_completo: nome, 
         email: email,
-        telefone: Number(telefone), 
+        telefone: Number(telefone),
+        data: dataStringFormatada, 
       },
     ]);
 
@@ -48,9 +49,7 @@ async function criarNovoAgendamento() {
     console.error("Erro ao salvar agendamento:", error.message);
     alert("Falha ao salvar agendamento no banco!");
   } else {
-    alert("Agendamento realizado com sucesso!");
     setIsModalAberto(false); 
-    
     
     const { data } = await supabase.from("agendamento").select();
     if (data) setAgendamentos(data);
