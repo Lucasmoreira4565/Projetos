@@ -44,8 +44,8 @@ export default function TimeSlots({
 
  
   return (
-    <div className="w-full max-w-sm mt-6 bg-[#121212] border border-zinc-800 rounded-2xl p-6 shadow-2xl text-left block">
-      <h3 className="text-lg font-semibold text-zinc-200 mb-4">Horários disponíveis:</h3>
+    <div className="w-full mt-6 bg-[#121212] border border-zinc-800 rounded-2xl p-6 shadow-2xl max-w-xl flex flex-col items-center justify-center mx-auto">
+      <h3 className="text-2xl font-semibold text-zinc-200 mb-4">Horários disponíveis:</h3>
       
       <div className="grid grid-cols-4 gap-3 mb-6">
         {horariosDisponiveis.map((hora) => {
@@ -74,15 +74,6 @@ export default function TimeSlots({
           );
         })}
       </div>
-
-      {horarioSelecionado && (
-        <button
-          onClick={() => setIsModalAberto(true)}
-          className="w-full p-4 bg-green-800 hover:bg-zinc-200 text-white font-bold rounded-xl transition cursor-pointer text-center block mb-2"
-        >
-          Agendar Horário!
-        </button>
-      )}
 
       {isModalAberto && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm z-50">
@@ -131,7 +122,7 @@ export default function TimeSlots({
               </button>
 
               <button
-                onClick={criarNovoAgendamento} // <-- AGORA ELE CHAMA A FUNÇÃO QUE SALVA NO SUPABASE
+                onClick={criarNovoAgendamento}
                 className="flex-1 p-3 bg-zinc-100 hover:bg-zinc-200 text-black font-bold rounded-xl transition cursor-pointer text-sm"
                   >
                 Confirmar
