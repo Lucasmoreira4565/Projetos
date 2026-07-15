@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { addDays, format, isSameDay, startOfWeek, subDays } from "date-fns";
+import { addDays, format, isSameDay, startOfWeek, subDays,isBefore,startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
 
 
 interface WeeklyCalendarProps {
@@ -12,6 +13,7 @@ export default function WeeklyCalendar({
     dataSelecionada,
     setDataSelecionada,
 }: WeeklyCalendarProps) {
+    const hoje = startOfDay(new Date());
     const [dataInicioSemana, setDataInicioSemana] = useState<Date>(new Date());
     const segundaFeira = startOfWeek(dataInicioSemana, { weekStartsOn: 1 });
     const diasDaSemana = Array.from({ length: 5 }, (_, i) => addDays(segundaFeira, i));
@@ -56,23 +58,31 @@ export default function WeeklyCalendar({
                     const selecionado = dataSelecionada && isSameDay(dia, dataSelecionada);
                     const nomeDia = format(dia, "eee", { locale: ptBR });
                     const numeroDia = format(dia, "d");
-
+                    const diaZerado = startOfDay(dia);
+                    const estaNoPassado = isBefore(diaZerado, hoje);
                     const diaSemanaNum = dia.getDay();
                     const finalDeSemana = diaSemanaNum === 0 || diaSemanaNum === 6;
                     if (finalDeSemana) return null;
 
                     return (
                         <button
-                            key={dia.toISOString()}
-                            type="button"
+                            key={dia.toString()}
+                            disabled={estaNoPassado}
                             onClick={() => setDataSelecionada(dia)}
-                            className={`flex-1 min-w-[55px] p-3 rounded-2xl flex flex-col items-center transition cursor-pointer border ${selecionado
-                                    ? "bg-zinc-100 border-white text-black font-bold"
-                                    : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                            className={`flex flex-col items-center justify-center p-4 rounded-xl transition w-35
+                                       ${selecionado
+                                    ? "bg-zinc-100 text-black font-bold"
+                                    : estaNoPassado
+                                        ? "bg-zinc-900/40 text-zinc-600 opacity-30 cursor-not-allowed pointer-events-none"
+                                        : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white cursor-pointer"
                                 }`}
-                        >
-                            <span className="text-xs uppercase opacity-80">{nomeDia}</span>
-                            <span className="text-lg font-bold mt-1">{numeroDia}</span>
+                                 >
+                            <span className="text-xs uppercase font-medium">
+                                {format(dia, "eee", { locale: ptBR })}
+                            </span>
+                            <span className="text-lg font-bold mt-1">
+                                {format(dia, "d")}
+                            </span>
                         </button>
                     );
                 })}

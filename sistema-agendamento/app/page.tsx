@@ -10,6 +10,7 @@ import WeeklyCalendar from "@/components/weeklycalendar";
 
 
 export default function Home() {
+  const [erroValidacao, setErroValidacao] = useState(false);
   const [mesAtual, setMesAtual] = useState<Date>(new Date());
   const [horarioSelecionado, setHorarioSelecionado] = useState<string | null>(null);
   const [nome, setNome] = useState("");
@@ -24,6 +25,7 @@ export default function Home() {
   const [profissionalSelecionado, setProfissionalSelecionado] = useState<number | null>(null);
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date());
   const [etapa, setEtapa] = useState<number>(1);
+  
 
   useEffect(() => {
     async function carregarDados() {
@@ -39,11 +41,13 @@ export default function Home() {
   }, []);
 
    async function criarNovoAgendamento() {
-    if (!dataSelecionada || !horarioSelecionado || !nome || !telefone || !email || !servicoSelecionado || !profissionalSelecionado) {
-      alert("Por favor, selecione o serviço, profissional, data, horário e preencha seus dados de contato.");
+     if (!dataSelecionada || !horarioSelecionado || !nome || !telefone || !email || !servicoSelecionado || !profissionalSelecionado) {
+       console.log("Validação falhou! Ativando erroValidacao...");
+      setErroValidacao(true);
+
       return;
     }
-
+        setErroValidacao(false);
     try {
       const ano = dataSelecionada.getFullYear();
       const mes = String(dataSelecionada.getMonth() + 1).padStart(2, "0");
@@ -116,6 +120,8 @@ export default function Home() {
                     setIsModalAberto={setIsModalAberto}
                     agendamentos={agendamentos}
                     criarNovoAgendamento={criarNovoAgendamento}
+                    erroValidacao={erroValidacao}
+                    setErroValidacao={setErroValidacao}
                   />
                 </div>
              
@@ -153,7 +159,7 @@ export default function Home() {
                   onClick={() => setEtapa(3)}
                   className="w-full p-4 bg-zinc-100 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-xl transition cursor-pointer text-center block"
                 >
-                  Avançar para Identificação
+                  Próximo
                 </button>
               </div>
             )}
@@ -174,43 +180,75 @@ export default function Home() {
                   <h3 className="text-lg font-bold text-white mb-4">Dados para o Agendamento</h3>
 
                   <div className="space-y-4">
+                    {/* 1. Nome Completo */}
                     <div>
-                      <label className="text-xs text-zinc-400 block mb-1">Nome Completo</label>
+                      <label className={`text-xs block mb-1 transition-colors ${erroValidacao && !nome ? "text-red-500 font-semibold" : "text-zinc-400"
+                        }`}>
+                        Nome Completo {erroValidacao && !nome && <span className="text-[10px]">(Obrigatório)</span>}
+                      </label>
                       <input
                         type="text"
                         placeholder="Ex: João Silva"
                         value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
+                        onChange={(e) => {
+                          setNome(e.target.value);
+                          if (erroValidacao) setErroValidacao(false);
+                        }}
+                        className={`w-full p-3 bg-zinc-900 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none transition text-sm ${erroValidacao && !nome
+                            ? "border-red-500/80 focus:border-red-500"
+                            : "border-zinc-800 focus:border-zinc-500"
+                          }`}
                       />
                     </div>
 
+                    {/* 2. Telefone */}
                     <div>
-                      <label className="text-xs text-zinc-400 block mb-1">Telefone (DDD + Número)</label>
+                      <label className={`text-xs block mb-1 transition-colors ${erroValidacao && !telefone ? "text-red-500 font-semibold" : "text-zinc-400"
+                        }`}>
+                        Telefone (DDD + Número) {erroValidacao && !telefone && <span className="text-[10px]">(Obrigatório)</span>}
+                      </label>
                       <input
                         type="tel"
                         placeholder="Ex: 27999999999"
                         value={telefone}
-                        onChange={(e) => setTelefone(e.target.value)}
-                        className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
+                        onChange={(e) => {
+                          setTelefone(e.target.value);
+                          if (erroValidacao) setErroValidacao(false);
+                        }}
+                        className={`w-full p-3 bg-zinc-900 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none transition text-sm ${erroValidacao && !telefone
+                            ? "border-red-500/80 focus:border-red-500"
+                            : "border-zinc-800 focus:border-zinc-500"
+                          }`}
                       />
                     </div>
 
+                    {/* 3. E-mail */}
                     <div>
-                      <label className="text-xs text-zinc-400 block mb-1">E-mail</label>
+                      <label className={`text-xs block mb-1 transition-colors ${erroValidacao && !email ? "text-red-500 font-semibold" : "text-zinc-400"
+                        }`}>
+                        E-mail {erroValidacao && !email && <span className="text-[10px]">(Obrigatório)</span>}
+                      </label>
                       <input
                         type="email"
                         placeholder="Ex: joao@email.com"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
-                        />
-                        <button
-                         type="button"
-                         onClick={criarNovoAgendamento}
-                         className="w-full p-4 bg-green-800 hover:bg-green-700 text-white font-bold rounded-xl transition cursor-pointer text-center block mt-4">
-                          Realizar Agendamento
-                         </button>
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (erroValidacao) setErroValidacao(false);
+                        }}
+                        className={`w-full p-3 bg-zinc-900 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none transition text-sm ${erroValidacao && !email
+                            ? "border-red-500/80 focus:border-red-500"
+                            : "border-zinc-800 focus:border-zinc-500"
+                          }`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={criarNovoAgendamento}
+                        className="w-full p-4 bg-green-800 hover:bg-green-700 text-white font-bold rounded-xl transition cursor-pointer text-center block mt-6"
+                      >
+                        Realizar Agendamento!
+                      </button>
                     </div>
                   </div>
                 </div>
