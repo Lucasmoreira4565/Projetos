@@ -7,7 +7,7 @@ import TimeSlots from "@/components/timeslots";
 import SelectorServicos from "@/components/seletorservicos";
 import SelectorProfissionais from "@/components/seletorprofissionais";
 import WeeklyCalendar from "@/components/weeklycalendar";
-
+import BackgroundLayout from "@/components/backgroundlayout";
 
 export default function Home() {
   const [erroValidacao, setErroValidacao] = useState(false);
@@ -84,10 +84,9 @@ export default function Home() {
     }
   }
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#000000] text-[#ededed] p-8">
-      <main className="flex w-full max-w-4xl flex-col items-center justify-center text-center">
-        <div className="w-full bg-[#363636] border border-zinc-500/100 rounded-3xl p-10 mb-8 flex flex-col items-center">
+    return (
+    <BackgroundLayout>
+      <div className="w-full bg-[#363636] border border-zinc-500/100 rounded-3xl p-10 mb-8 flex flex-col items-center shadow-2xl">
 
           <BannerHeader />
 
@@ -180,7 +179,7 @@ export default function Home() {
                   <h3 className="text-lg font-bold text-white mb-4">Dados para o Agendamento</h3>
 
                   <div className="space-y-4">
-                    {/* 1. Nome Completo */}
+                    
                     <div>
                       <label className={`text-xs block mb-1 transition-colors ${erroValidacao && !nome ? "text-red-500 font-semibold" : "text-zinc-400"
                         }`}>
@@ -201,7 +200,7 @@ export default function Home() {
                       />
                     </div>
 
-                    {/* 2. Telefone */}
+                    
                     <div>
                       <label className={`text-xs block mb-1 transition-colors ${erroValidacao && !telefone ? "text-red-500 font-semibold" : "text-zinc-400"
                         }`}>
@@ -222,7 +221,7 @@ export default function Home() {
                       />
                     </div>
 
-                    {/* 3. E-mail */}
+                    
                     <div>
                       <label className={`text-xs block mb-1 transition-colors ${erroValidacao && !email ? "text-red-500 font-semibold" : "text-zinc-400"
                         }`}>
@@ -257,7 +256,7 @@ export default function Home() {
           </div>
 
         </div>
-      </main>
-    </div>
+     </BackgroundLayout>
+   
   );
 }
