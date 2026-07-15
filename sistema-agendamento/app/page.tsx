@@ -38,33 +38,45 @@ export default function Home() {
     carregarDados();
   }, []);
 
-  async function criarNovoAgendamento() {
+   async function criarNovoAgendamento() {
+    if (!dataSelecionada || !horarioSelecionado || !nome || !telefone || !email || !servicoSelecionado || !profissionalSelecionado) {
+      alert("Por favor, selecione o serviço, profissional, data, horário e preencha seus dados de contato.");
+      return;
+    }
 
-    const ano = dataSelecionada?.getFullYear();
-    const mes = String(dataSelecionada ? dataSelecionada.getMonth() + 1 : "").padStart(2, "0");
-    const dia = String(dataSelecionada?.getDate()).padStart(2, "0");
-    const dataStringFormatada = `${ano}-${mes}-${dia} ${horarioSelecionado}:00`;
-    const { error } = await supabase.
-      from("agendamento")
-      .insert([
-        {
-          nome_completo: nome,
-          email: email,
-          telefone: Number(telefone),
-          data: dataStringFormatada,
-          servico_id: servicoSelecionado,
-          profissional_id: profissionalSelecionado,
-        },
-      ]);
+    try {
+      const ano = dataSelecionada.getFullYear();
+      const mes = String(dataSelecionada.getMonth() + 1).padStart(2, "0");
+      const dia = String(dataSelecionada.getDate()).padStart(2, "0");
+      const dataStringFormatada = `${ano}-${mes}-${dia} ${horarioSelecionado}`;
+      const { data, error } = await supabase
+        .from("agendamento")
+        .insert([
+          {
+            nome_completo: nome,
+            email: email,
+            telefone: Number(telefone), 
+            data: dataStringFormatada,
+            servico_id: servicoSelecionado,
+            profissional_id: profissionalSelecionado,
+          },
+        ])
+        .select();
 
-    if (error) {
-      console.error("Erro ao salvar agendamento:", error.message);
-      alert("Falha ao salvar agendamento no banco!");
-    } else {
-      setIsModalAberto(false);
-
-      const { data } = await supabase.from("agendamento").select();
-      if (data) setAgendamentos(data);
+      
+      if (error) {
+        console.error("Erro retornado pelo Supabase:", error.message);
+        alert(`Falha ao registrar agendamento: ${error.message}`);
+        return;
+      }
+      
+      setNome("");
+      setTelefone("");
+      setEmail("");
+      setHorarioSelecionado(null);
+      setEtapa(1); 
+    } catch (err) {
+      console.error("Erro inesperado ao criar agendamento:", err);
     }
   }
 
@@ -193,6 +205,12 @@ export default function Home() {
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition text-sm"
                         />
+                        <button
+                         type="button"
+                         onClick={criarNovoAgendamento}
+                         className="w-full p-4 bg-green-800 hover:bg-green-700 text-white font-bold rounded-xl transition cursor-pointer text-center block mt-4">
+                          Realizar Agendamento
+                         </button>
                     </div>
                   </div>
                 </div>
