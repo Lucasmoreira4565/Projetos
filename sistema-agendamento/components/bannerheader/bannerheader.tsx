@@ -9,6 +9,7 @@ export default function BannerHeader() {
           alt="Banner da Empresa"
           fill
           loading="eager"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover"
         />
       </div>
@@ -19,7 +20,7 @@ export default function BannerHeader() {
           alt="Logo da Empresa"
           width={80}
           height={80}
-          className="rounded-xl h-auto object-cover"
+          className="rounded-xl h-auto w-auto object-cover"
         />
         <h1 className="text-4xl font-extrabold tracking-tight text-zinc-100">
           Moreira's Barber
