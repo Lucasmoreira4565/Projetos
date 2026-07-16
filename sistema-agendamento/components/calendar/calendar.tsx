@@ -1,7 +1,7 @@
 import { DayPicker } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
 
-// Definindo o tipo das Props para o TypeScript
+
 interface CalendarProps {
   dataSelecionada: Date | undefined;
   setDataSelecionada: (date: Date | undefined) => void;

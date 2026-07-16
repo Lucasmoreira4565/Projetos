@@ -7,7 +7,7 @@ interface BackgroundLayoutProps {
 
 export default function BackgroundLayout({ children }: BackgroundLayoutProps) {
     return (
-        // Container Principal: Controla a centralização matemática de tudo na tela
+       
         <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden p-4 sm:p-8">
 
             <Image
