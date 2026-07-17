@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function BannerHeader() {
   return (
     <>
-      <div className="w-full h-84 relative overflow-hidden rounded-2xl mb-6">
+      <div className="w-full h-32 sm:h-48 relative overflow-hidden rounded-2xl mb-6">
         <Image
           src="/banner.jpg"
           alt="Banner da Empresa"
@@ -20,7 +20,8 @@ export default function BannerHeader() {
           alt="Logo da Empresa"
           width={80}
           height={80}
-          className="rounded-xl h-auto w-auto object-cover"
+          style={{ width: 'auto !important', height: 'auto !important' }}
+          className="rounded-xl object-cover"
         />
         <h1 className="text-4xl font-extrabold tracking-tight text-zinc-100">
           Moreira's Barber

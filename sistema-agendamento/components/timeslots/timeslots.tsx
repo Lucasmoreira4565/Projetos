@@ -1,6 +1,3 @@
-import { useState } from "react";
-
-
 interface TimeSlotsProps {
   dataSelecionada: Date;
   horarioSelecionado: string | null;
@@ -50,7 +47,7 @@ export default function TimeSlots({
 
  
   return (
-    <div className="w-full mt-6 bg-[#121212] border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-2xl max-w-xl flex flex-col items-center justify-center mx-auto transition-all">
+    <div className="w-[380px] md:w-[512px] bg-[#121212] border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-2xl max-w-2xl flex flex-col items-center justify-center mx-auto transition-all duration-300">
       <h3 className="text-2xl font-semibold text-zinc-200 mb-4">Horários disponíveis:</h3>
       
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full mt-6 px-2">

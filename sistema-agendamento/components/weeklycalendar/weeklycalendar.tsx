@@ -26,38 +26,35 @@ export default function WeeklyCalendar({
     };
 
     return (
-        <div className="mb-6 text-left w-full">
-            
+        
+        <div className="mb-1 text-left md:w-[512px] max-w-4xl mx-auto px-0">
+
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-sm font-semibold text-zinc-400">
                     Selecione o Dia:
                 </h3>
 
-              
                 <div className="flex gap-3">
                     <button
                         type="button"
                         onClick={voltarSemana}
-                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer"
+                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer text-xs"
                     >
                         ← Anterior
                     </button>
                     <button
                         type="button"
                         onClick={avancarSemana}
-                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer"
+                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer text-xs"
                     >
                         Próxima →
                     </button>
                 </div>
             </div>
 
-            
-            <div className="flex justify-between gap-2 overflow-x-auto pb-2 scrollbar-none w-full">
+            <div className="grid grid-cols-5 gap-2 w-full max-w-lg mx-auto "> 
                 {diasDaSemana.map((dia) => {
                     const selecionado = dataSelecionada && isSameDay(dia, dataSelecionada);
-                    const nomeDia = format(dia, "eee", { locale: ptBR });
-                    const numeroDia = format(dia, "d");
                     const diaZerado = startOfDay(dia);
                     const estaNoPassado = isBefore(diaZerado, hoje);
                     const diaSemanaNum = dia.getDay();
@@ -69,18 +66,19 @@ export default function WeeklyCalendar({
                             key={dia.toString()}
                             disabled={estaNoPassado}
                             onClick={() => setDataSelecionada(dia)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl transition w-35
-                                       ${selecionado
+                            className={`flex flex-col items-center justify-center p-2 sm:p-4 rounded-xl transition w-full min-w-0
+                          ${selecionado
                                     ? "bg-zinc-100 text-black font-bold"
                                     : estaNoPassado
                                         ? "bg-zinc-900/40 text-zinc-600 opacity-30 cursor-not-allowed pointer-events-none"
                                         : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white cursor-pointer"
                                 }`}
-                                 >
-                            <span className="text-xs uppercase font-medium">
+                        >
+                
+                            <span className="text-[10px] sm:text-xs uppercase font-medium tracking-wider block text-center truncate w-full">
                                 {format(dia, "eee", { locale: ptBR })}
                             </span>
-                            <span className="text-lg font-bold mt-1">
+                            <span className="text-base sm:text-lg font-bold mt-1 block text-center w-full">
                                 {format(dia, "d")}
                             </span>
                         </button>
