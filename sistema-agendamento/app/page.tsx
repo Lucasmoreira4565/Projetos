@@ -85,7 +85,7 @@ export default function Home() {
 
     return (
     <BackgroundLayout>
-      <div className="w-[448px] md:w-full bg-[#363636]/80 border border-zinc-500/100 rounded-3xl p-2 sm:p-10 mb-8 flex flex-col items-center shadow-2xl">
+      <div className="w-full bg-[#363636]/80 border border-zinc-500/100 rounded-3xl p-2 sm:p-10 mb-8 flex flex-col items-center shadow-2xl">
 
           <BannerHeader />
           <div className="w-full max-w-4xl mx-auto bg-zinc-950/40 border border-zinc-800/30 rounded-3xl p-4 sm:p-6 backdrop-blur-md mt-6 sm:mt-8">
