@@ -91,7 +91,7 @@ export default function Home() {
           <div className="w-full max-w-4xl mx-auto bg-zinc-950/40 border border-zinc-800/30 rounded-3xl p-4 sm:p-6 backdrop-blur-md mt-6 sm:mt-8">
 
             {etapa === 1 && (
-              <div className="flex flex-col gap-2 w-full max-w-md mx-auto animate-fade-in">
+              <div className="flex flex-col gap-2 w-full animate-fade-in">
                 <WeeklyCalendar
                   dataSelecionada={dataSelecionada}
                   setDataSelecionada={setDataSelecionada}

@@ -27,10 +27,10 @@ export default function WeeklyCalendar({
 
     return (
         
-        <div className="mb-1 text-left md:w-[512px] max-w-4xl mx-auto px-0">
+        <div className="mb-1 text-left w-full">
 
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-semibold text-zinc-400">
+                <h3 className="sm:text-lg font-semibold text-zinc-400">
                     Selecione o Dia:
                 </h3>
 
@@ -38,21 +38,21 @@ export default function WeeklyCalendar({
                     <button
                         type="button"
                         onClick={voltarSemana}
-                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer text-xs"
+                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer sm:text-lg"
                     >
                         ← Anterior
                     </button>
                     <button
                         type="button"
                         onClick={avancarSemana}
-                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer text-xs"
+                        className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition cursor-pointer sm:text-lg"
                     >
                         Próxima →
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-5 gap-2 w-full max-w-lg mx-auto "> 
+            <div className="grid grid-cols-5 gap-2 max-w-lg mx-auto"> 
                 {diasDaSemana.map((dia) => {
                     const selecionado = dataSelecionada && isSameDay(dia, dataSelecionada);
                     const diaZerado = startOfDay(dia);
@@ -75,10 +75,10 @@ export default function WeeklyCalendar({
                                 }`}
                         >
                 
-                            <span className="text-[10px] sm:text-xs uppercase font-medium tracking-wider block text-center truncate w-full">
+                            <span className="md:text-xs text-[9px] uppercase font-medium tracking-wider block text-center truncate w-full">
                                 {format(dia, "eee", { locale: ptBR })}
                             </span>
-                            <span className="text-base sm:text-lg font-bold mt-1 block text-center w-full">
+                            <span className="text-base sm:text-lg font-bold mt-1 block text-center max-w-lg">
                                 {format(dia, "d")}
                             </span>
                         </button>
