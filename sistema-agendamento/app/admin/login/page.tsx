@@ -13,9 +13,23 @@ export default function LoginPage() {
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
-        console.log("Tentando logar com:", email, password);
-    }
+        setCarregando(true);
+        setErro("");
+        const supabase = createClient();
 
+        const {data,error} = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+        })
+        
+        if (error){
+            setErro("E-mail ou senha Incorretos");
+            setCarregando(false);
+            return;
+        }
+        router.push("/admin/dashboard");
+    }
+    
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <form onSubmit={handleLogin} className="flex flex-col gap-4 p-6 bg-white rounded-lg shadow-md w-80">
