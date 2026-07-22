@@ -16,36 +16,23 @@ export default function DashboardPage() {
     useEffect(() => {
         async function buscarAgendamentos() {
             const supabase = createClient();
-
-            /* 
-            // Descomente esta parte após testar a exibição dos dados:
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
               router.push("/admin/login");
               return;
             }
-            */
-
-            console.log("🔍 BUSCANDO DADOS NO SUPABASE...");
-
-            // 1. Busca Agendamentos e Serviços em paralelo
             const { data: agendamentosData, error: errAg } = await supabase
                 .from("agendamento")
                 .select("*");
-
             const { data: servicosData, error: errServ } = await supabase
                 .from("servicos")
                 .select("*");
-
-            console.log("AGENDAMENTOS RETORNADOS:", agendamentosData);
-            console.log("SERVIÇOS RETORNADOS:", servicosData);
 
             if (errAg || errServ) {
                 console.error("Erro ao buscar no Supabase:", errAg || errServ);
             }
 
             if (agendamentosData && Array.isArray(agendamentosData)) {
-                // 2. Mapeia cruzando com o serviço correto
                 const combinados = agendamentosData.map((item) => {
                     const servicoEncontrado = servicosData?.find(
                         (s) => s.id === item.servico_id || s.nome === item.servico
@@ -56,7 +43,6 @@ export default function DashboardPage() {
                     };
                 });
 
-                // 3. Ordena por data (mais recentes primeiro)
                 combinados.sort(
                     (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
                 );
@@ -97,11 +83,9 @@ export default function DashboardPage() {
         return `https://wa.me/${apenasNumeros}?text=${mensagem}`;
     }
 
-    // --- LÓGICA DE FILTRAGEM SEGURA DE DATA ---
+   
     const agendamentosFiltrados = agendamentos.filter((item) => {
         if (!item.data) return false;
-
-        // Converte a string YYYY-MM-DD mantendo fuso local
         const dataItem = new Date(item.data);
         const hoje = new Date();
 
@@ -128,8 +112,7 @@ export default function DashboardPage() {
 
         return true;
     });
-
-    // --- CÁLCULO DO FATURAMENTO ESTIMADO ---
+    
     const faturamentoTotal = agendamentosFiltrados.reduce((acumulador, item) => {
         const valor = Number(
             item.servico?.preco || item.servico?.valor || item.preco || 0
@@ -217,7 +200,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Lista de Atendimentos */}
+              
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h2 className="text-lg font-bold text-gray-800 mb-4">
                         Próximos Atendimentos
