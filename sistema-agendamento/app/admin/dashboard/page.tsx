@@ -5,13 +5,22 @@ import { createClient } from "@/supabase/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle,Calendar } from "lucide-react";
+import { ResponsiveContainer, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend,} from "recharts";
 
 export default function DashboardPage() {
+    const [tipoGraficoAtendimentos, setTipoGraficoAtendimentos] = useState<"linha" | "barra">("linha");
+    const [tipoGraficoServicos, setTipoGraficoServicos] = useState<"barra" | "pizza">("pizza");
+    const CORES_PIZZA = ["#18181b", "#059669", "#2563eb", "#d97706", "#dc2626"];
     const [agendamentos, setAgendamentos] = useState<any[]>([]);
     const [carregando, setCarregando] = useState(true);
     const router = useRouter();
-    const [filtroPeriodo, setFiltroPeriodo] = useState<"hoje" | "semana" | "mes">("hoje");
+    const hojeStr = new Date().toISOString().split("T")[0];
+    const [dataInicio, setDataInicio] = useState<string>(hojeStr);
+    const [dataFim, setDataFim] = useState<string>(hojeStr);
+    const [dataInicioAplicada, setDataInicioAplicada] = useState<string>(hojeStr);
+    const [dataFimAplicada, setDataFimAplicada] = useState<string>(hojeStr);
+    const [filtroPeriodo, setFiltroPeriodo] = useState<"hoje" | "semana" | "mes" | "customizado">("hoje");
 
     useEffect(() => {
         async function buscarAgendamentos() {
@@ -83,17 +92,27 @@ export default function DashboardPage() {
         return `https://wa.me/${apenasNumeros}?text=${mensagem}`;
     }
 
+    function handleAplicarFiltro() {
+        setDataInicioAplicada(dataInicio);
+        setDataFimAplicada(dataFim);
+    }
+    
    
     const agendamentosFiltrados = agendamentos.filter((item) => {
         if (!item.data) return false;
+
         const dataItem = new Date(item.data);
         const hoje = new Date();
+        const inicio = new Date(`${dataInicio}T00:00:00`);
+        const fim = new Date(`${dataFim}T23:59:59`);
 
         if (filtroPeriodo === "hoje") {
+            
             return (
                 dataItem.getDate() === hoje.getDate() &&
                 dataItem.getMonth() === hoje.getMonth() &&
-                dataItem.getFullYear() === hoje.getFullYear()
+                dataItem.getFullYear() === hoje.getFullYear() &&
+                dataItem >= hoje
             );
         }
 
@@ -110,15 +129,24 @@ export default function DashboardPage() {
             );
         }
 
+        if (filtroPeriodo === "customizado") {
+            const inicio = new Date(`${dataInicioAplicada}T00:00:00`);
+            const fim = new Date(`${dataFimAplicada}T23:59:59`);
+
+            return dataItem >= inicio && dataItem <= fim;
+            }
         return true;
     });
-    
+
     const faturamentoTotal = agendamentosFiltrados.reduce((acumulador, item) => {
         const valor = Number(
             item.servico?.preco || item.servico?.valor || item.preco || 0
         );
         return acumulador + valor;
     }, 0);
+
+    const dadosAtendimentos = prepararDadosAtendimentos(agendamentosFiltrados);
+    const dadosServicos = prepararDadosServicos(agendamentosFiltrados);
 
     if (carregando) {
         return (
@@ -128,11 +156,51 @@ export default function DashboardPage() {
         );
     }
 
+    function prepararDadosAtendimentos(agendamentos: any[]) {
+        const contagemPorData: { [key: string]: number } = {};
+
+        agendamentos.forEach((item) => {
+            if (!item.data) return;
+            const dataFormatada = new Date(item.data).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+            });
+
+            contagemPorData[dataFormatada] = (contagemPorData[dataFormatada] || 0) + 1;
+        });
+
+        return Object.keys(contagemPorData).map((data) => ({
+            data,
+            total: contagemPorData[data],
+        }));
+    }
+
+    function prepararDadosServicos(agendamentos: any[]) {
+        const contagemPorServico: { [key: string]: { quantidade: number; faturamento: number } } = {};
+
+        agendamentos.forEach((item) => {
+            const nomeServico = item.servico?.nome || item.servico || "Outros";
+            const valor = Number(item.servico?.preco || item.servico?.valor || item.preco || 0);
+
+            if (!contagemPorServico[nomeServico]) {
+                contagemPorServico[nomeServico] = { quantidade: 0, faturamento: 0 };
+            }
+
+            contagemPorServico[nomeServico].quantidade += 1;
+            contagemPorServico[nomeServico].faturamento += valor;
+        });
+
+        return Object.keys(contagemPorServico).map((nome) => ({
+            nome,
+            quantidade: contagemPorServico[nome].quantidade,
+            faturamento: contagemPorServico[nome].faturamento,
+        }));
+    }
+    
     return (
         <main className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-4xl mx-auto space-y-6">
-
-                {/* Topo / Cabeçalho */}
+              
                 <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
                     <h1 className="text-xl font-bold text-gray-800">Painel do Barbeiro</h1>
                     <button
@@ -143,7 +211,6 @@ export default function DashboardPage() {
                     </button>
                 </div>
 
-                {/* Botões do Filtro de Período */}
                 <div className="flex gap-2 bg-gray-200/60 p-1 rounded-lg w-fit">
                     <button
                         onClick={() => setFiltroPeriodo("hoje")}
@@ -174,9 +241,157 @@ export default function DashboardPage() {
                     >
                         Este Mês
                     </button>
-                </div>
+                    <button
+                        onClick={() => setFiltroPeriodo("customizado")}
+                        className={`px-4 py-2 text-sm font-medium rounded-md transition flex items-center gap-1.5 ${filtroPeriodo === "customizado"
+                            ? "bg-white text-gray-900 shadow-sm"
+                            : "text-gray-600 hover:text-gray-900"
+                            }`}
+                    >
+                        <Calendar className="w-4 h-4 inline" />
+                        Período Específico
+                    </button>
 
-                {/* Cards de Métricas */}
+                </div>
+                {filtroPeriodo === "customizado" && (
+                    <div className="flex gap-2 items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 mt-2">
+                        <label className="text-sm font-medium text-gray-600">De:</label>
+                        <input
+                            type="date"
+                            value={dataInicio}
+                            onChange={(e) => setDataInicio(e.target.value)}
+                            className="border border-gray-300 rounded p-1 text-sm text-gray-800"
+                        />
+
+                        <label className="text-sm font-medium text-gray-600">Até:</label>
+                        <input
+                            type="date"
+                            value={dataFim}
+                            onChange={(e) => setDataFim(e.target.value)}
+                            className="border border-gray-300 rounded p-1 text-sm text-gray-800"
+                        />
+                        <button
+                            onClick={handleAplicarFiltro}
+                            className="bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold px-3 py-2 rounded transition"
+                        >
+                            Filtrar
+                        </button>
+                    </div>
+                )}
+             
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    
+                    <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-base font-bold text-gray-800">Atendimentos no Período</h3>
+
+                           
+                            <div className="flex gap-1 bg-gray-100 p-1 rounded">
+                                <button
+                                    onClick={() => setTipoGraficoAtendimentos("linha")}
+                                    className={`px-2 py-1 text-xs font-semibold rounded transition ${tipoGraficoAtendimentos === "linha"
+                                            ? "bg-white shadow-sm text-gray-900"
+                                            : "text-gray-500 hover:text-gray-900"
+                                        }`}
+                                >
+                                    Linha
+                                </button>
+                                <button
+                                    onClick={() => setTipoGraficoAtendimentos("barra")}
+                                    className={`px-2 py-1 text-xs font-semibold rounded transition ${tipoGraficoAtendimentos === "barra"
+                                            ? "bg-white shadow-sm text-gray-900"
+                                            : "text-gray-500 hover:text-gray-900"
+                                        }`}
+                                >
+                                    Barra
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                {tipoGraficoAtendimentos === "linha" ? (
+                                    <LineChart data={dadosAtendimentos}>
+                                        <XAxis dataKey="data" stroke="#888888" fontSize={12} />
+                                        <YAxis stroke="#888888" fontSize={12} allowDecimals={false} />
+                                        <Tooltip />
+                                        <Line type="monotone" dataKey="total" name="Atendimentos" stroke="#18181b" strokeWidth={2} />
+                                    </LineChart>
+                                ) : (
+                                    <BarChart data={dadosAtendimentos}>
+                                        <XAxis dataKey="data" stroke="#888888" fontSize={12} />
+                                        <YAxis stroke="#888888" fontSize={12} allowDecimals={false} />
+                                        <Tooltip />
+                                        <Bar dataKey="total" name="Atendimentos" fill="#18181b" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                )}
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* --- GRÁFICO 2: SERVIÇOS MAIS PEDIDOS / FATURAMENTO --- */}
+                    <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-base font-bold text-gray-800">Serviços / Faturamento</h3>
+
+                            {/* Botões para alternar o tipo de gráfico */}
+                            <div className="flex gap-1 bg-gray-100 p-1 rounded">
+                                <button
+                                    onClick={() => setTipoGraficoServicos("pizza")}
+                                    className={`px-2 py-1 text-xs font-semibold rounded transition ${tipoGraficoServicos === "pizza"
+                                            ? "bg-white shadow-sm text-gray-900"
+                                            : "text-gray-500 hover:text-gray-900"
+                                        }`}
+                                >
+                                    Círculo
+                                </button>
+                                <button
+                                    onClick={() => setTipoGraficoServicos("barra")}
+                                    className={`px-2 py-1 text-xs font-semibold rounded transition ${tipoGraficoServicos === "barra"
+                                            ? "bg-white shadow-sm text-gray-900"
+                                            : "text-gray-500 hover:text-gray-900"
+                                        }`}
+                                >
+                                    Barra
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                {tipoGraficoServicos === "pizza" ? (
+                                    <PieChart>
+                                        <Pie
+                                            data={dadosServicos}
+                                            dataKey="faturamento"
+                                            nameKey="nome"
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={80}
+                                            label={true}
+                                        >
+                                            {dadosServicos.map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill={CORES_PIZZA[index % CORES_PIZZA.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip formatter={(value: any) => `R$ ${Number(value).toFixed(2)}`} />
+                                        <Legend />
+                                    </PieChart>
+                                ) : (
+                                    <BarChart data={dadosServicos}>
+                                        <XAxis dataKey="nome" stroke="#888888" fontSize={12} />
+                                        <YAxis stroke="#888888" fontSize={12} />
+                                        <Tooltip formatter={(value: any) => `R$ ${Number(value).toFixed(2)}`} />
+                                        <Bar dataKey="faturamento" name="Faturamento (R$)" fill="#059669" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                )}
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
                         <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">

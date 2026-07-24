@@ -35,6 +35,7 @@ export default function Home() {
       if (servicosData) setServicos(servicosData);
       const { data: profissionaisData } = await supabase.from("profissionais").select();
       if (profissionaisData) setProfissionais(profissionaisData);
+      console.log("Profissionais buscados:", profissionaisData);
     }
     carregarDados();
   }, []);
