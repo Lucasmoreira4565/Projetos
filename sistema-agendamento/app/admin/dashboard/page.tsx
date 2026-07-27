@@ -37,10 +37,6 @@ export default function DashboardPage() {
                 .from("servicos")
                 .select("*");
 
-            if (errAg || errServ) {
-                console.error("Erro ao buscar no Supabase:", errAg || errServ);
-            }
-
             if (agendamentosData && Array.isArray(agendamentosData)) {
                 const combinados = agendamentosData.map((item) => {
                     const servicoEncontrado = servicosData?.find(
