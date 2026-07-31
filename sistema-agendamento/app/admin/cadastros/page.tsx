@@ -71,7 +71,7 @@ export default function CadastrosPage() {
 
     function prepararEdicaoCliente(cliente: any) {
         setIdClienteEmEdicao(cliente.id);
-        setNomeCliente(cliente.nome);
+        setNomeCliente(cliente.nome_completo);
         setTelefoneCliente(cliente.telefone);
         setEmailCliente(cliente.email || "");
     }
